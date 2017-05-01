@@ -1,7 +1,9 @@
 <?php
-define('BNA_URL', "http://www.bna.com.ar/Cotizador/HistoricoPrincipales?id=billetes&fecha={day}%2F{month}%2F{year}&filtroEuro=1&filtroDolar=1");
-// for testing
-// define('BNA_URL', "sample{day}{month}{year}.html");
+if (isset($argv[3]) || isset($_GET['test'])) {
+	define('BNA_URL', "sample{day}{month}{year}.html");
+} else {
+	define('BNA_URL', "http://www.bna.com.ar/Cotizador/HistoricoPrincipales?id=billetes&fecha={day}%2F{month}%2F{year}&filtroEuro=1&filtroDolar=1");
+}
 define('DOLLAR', 'Dolar U.S.A');
 define('EURO', 'Euro');
 define('DAY', 24 * 60 * 60);
