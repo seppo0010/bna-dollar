@@ -132,11 +132,16 @@ for ($date = $dateFrom; $date <= $dateTo;) {
 	$allValues[DOLLAR] = array_merge($allValues[DOLLAR], $values[DOLLAR]);
 	$allValues[EURO] = array_merge($allValues[EURO], $values[EURO]);
 
-	$newDate = max(array_keys($allValues[DOLLAR]));
-	if ($newDate <= $date) {
+	$maxDate = max(array_keys($allValues[DOLLAR]));
+	if (strtotime($maxDate) < $date) {
+		$allValues[DOLLAR][date('Y-m-d', $date)] = $allValues[DOLLAR][$maxDate];
+		$allValues[EURO][date('Y-m-d', $date)] = $allValues[EURO][$maxDate];
 		$date += DAY;
 	} else {
-		$date = $newDate + DAY;
+		for (;$date <= strtotime($maxDate); $date += DAY) {
+			$allValues[DOLLAR][date('Y-m-d', $date)] = $allValues[DOLLAR][$maxDate];
+			$allValues[EURO][date('Y-m-d', $date)] = $allValues[EURO][$maxDate];
+		}
 	}
 }
 
