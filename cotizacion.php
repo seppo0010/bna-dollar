@@ -1,16 +1,18 @@
 <?php
 if (isset($argv[3]) || isset($_GET['test'])) {
 	define('BNA_URL', "sample{day}{month}{year}.html");
-	define('DB_HOST', 'localhost');
+	define('DB_HOST', '');
 	define('DB_USER', 'root');
 	define('DB_PASS', '');
 	define('DB_NAME', 'bna_test');
+	define('FILL_EMPTY', true);
 } else {
 	define('BNA_URL', "http://www.bna.com.ar/Cotizador/HistoricoPrincipales?id=billetes&fecha={day}%2F{month}%2F{year}&filtroEuro=1&filtroDolar=1");
 	define('DB_HOST', '');
 	define('DB_USER', '');
 	define('DB_PASS', '');
 	define('DB_NAME', '');
+	define('FILL_EMPTY', true);
 }
 
 define('DB_TABLE_NAME', 'currency');
@@ -54,6 +56,7 @@ function getValues($year, $month, $day) {
 		foreach ($row->childNodes as $cell) {
 			$values[] = trim($cell->textContent);
 		}
+
 		if ($keys === NULL) {
 			$keys = $values;
 		} else {
@@ -123,7 +126,7 @@ $allValues = array(
 	DOLLAR => array(),
 	EURO => array(),
 );
-for ($date = $dateFrom; $date <= $dateTo;) {
+for ($date = $dateFrom; $date <= $dateTo; $date += DAY) {
 	$values = getValues(
 		date('Y', $date),
 		date('m', $date),
@@ -131,17 +134,25 @@ for ($date = $dateFrom; $date <= $dateTo;) {
 	);
 	$allValues[DOLLAR] = array_merge($allValues[DOLLAR], $values[DOLLAR]);
 	$allValues[EURO] = array_merge($allValues[EURO], $values[EURO]);
+	if (!FILL_EMPTY) {
+		continue;
+	}
 
-	$maxDate = max(array_keys($allValues[DOLLAR]));
-	if (strtotime($maxDate) < $date) {
-		$allValues[DOLLAR][date('Y-m-d', $date)] = $allValues[DOLLAR][$maxDate];
-		$allValues[EURO][date('Y-m-d', $date)] = $allValues[EURO][$maxDate];
-		$date += DAY;
-	} else {
-		for (;$date <= strtotime($maxDate); $date += DAY) {
-			$allValues[DOLLAR][date('Y-m-d', $date)] = $allValues[DOLLAR][$maxDate];
-			$allValues[EURO][date('Y-m-d', $date)] = $allValues[EURO][$maxDate];
+	$lastValues = array();
+	for ($d = $dateFrom; $d < $date; $d += DAY) {
+		if (isset($allValues[DOLLAR][date('Y-m-d', $d)])) {
+			$lastValues[DOLLAR] = $allValues[DOLLAR][date('Y-m-d', $d)];
 		}
+		if (isset($allValues[EURO][date('Y-m-d', $d)])) {
+			$lastValues[EURO] = $allValues[EURO][date('Y-m-d', $d)];
+		}
+	}
+
+	if (!isset($allValues[DOLLAR][date('Y-m-d', $date)]) && isset($lastValues[DOLLAR])) {
+		$allValues[DOLLAR][date('Y-m-d', $date)] = $lastValues[DOLLAR];
+	}
+	if (!isset($allValues[EURO][date('Y-m-d', $date)]) && isset($lastValues[EURO])) {
+		$allValues[EURO][date('Y-m-d', $date)] = $lastValues[EURO];
 	}
 }
 

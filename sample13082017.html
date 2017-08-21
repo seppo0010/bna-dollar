@@ -1,0 +1,144 @@
+
+<script>
+	$.datepicker.regional['es'] = {
+	    closeText: 'Cerrar',
+	    prevText: '<Ant',
+	    nextText: 'Sig>',
+	    currentText: 'Hoy',
+	    monthNames: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+	    monthNamesShort: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+	    dayNames: ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
+	    dayNamesShort: ['Dom', 'Lun', 'Mar', 'Mié', 'Juv', 'Vie', 'Sáb'],
+	    dayNamesMin: ['Do', 'Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sá'],
+	    weekHeader: 'Sm',
+	    dateFormat: 'dd/mm/yy',
+	    firstDay: 1,
+	    isRTL: false,
+	    showMonthAfterYear: false,
+	    yearSuffix: ''
+	};
+	$.datepicker.setDefaults($.datepicker.regional['es']);
+	$(function () {
+	    $("#fecha").datepicker();
+	});
+</script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#buscarHistorico').on('click', function (e) {
+           // $('#modalHistorico .modal-title').text('busco');
+            $('#historicoPrincipalMonedas').hide();
+            e.preventDefault();
+            //Obtengo valores filtro
+            var filtroDolar = $('#filtroDolar').is(':checked');
+            if (filtroDolar) {
+                filtroDolar = 1;
+            } else {
+                filtroDolar = 0;
+            }
+            var filtroEuro = $('#filtroEuro').is(':checked');
+            if (filtroEuro) {
+                filtroEuro = 1;
+            } else {
+                filtroEuro = 0;
+            }
+            var fecha = $('#fecha').val();
+            $.ajax({
+                url: '/Cotizador/HistoricoPrincipales',
+                type: "GET",
+                async: false,
+                data: {
+                    id: 'billetes',
+                    fecha: fecha,
+                    filtroEuro:filtroEuro,
+                    filtroDolar:filtroDolar
+                },
+                success: function (result) {
+                    $('#modalHistorico .modal-body').html(result);   // this will update your target div with the result (your partial view)
+                }
+            });
+        });
+    });
+</script>
+
+
+<form>
+    <div class="CotizadorBox">
+        <div class="title">Buscador de cotización Dolar/Euro</div>
+                        
+		<div class="form-group">
+			<label for="" class="nombre">Moneda</label>
+            <div class="cont">
+                    <label class="checkbox-inline dolar">
+                        <input type="checkbox" id="filtroDolar" name="" checked><div class="txtform">Dolar U.S.A</div>
+                    </label>
+                    <label class="checkbox-inline euro">
+                        <input type="checkbox" id="filtroEuro" name="" checked><div class="txtform">Euro</div>
+                    </label>
+            </div>
+		</div><!--/form-group-->
+
+		<div class="form-group fecha">
+			<label for="" class="nombre">Fecha</label>
+            <div class="cont">
+                
+                <input type="text" id="fecha" value="13/08/2017" readonly />
+                <!--<input class="inputDate" id="fecha" value="06/14/2008" />-->
+                <!--<label id="closeOnSelect"><input type="checkbox"  checked/>Close on selection</label>                        -->
+            </div>
+		</div><!--/form-group-->
+	    <button type="submit" name="buscar" class="btn btn-primary cotizador" id="buscarHistorico">Buscar</button><br>
+    </div><!--/CotizadorBox-->
+
+</form>
+
+<div id="cotizacionesCercanas">
+    <p class="tituloCotizador">La cotizaciones más cercanas a la fecha solicitada son:</p>
+<br clear="all" />
+        <div id="tablaDolar" style="text-align:left;">
+           <h4 class="cotizador" style="float: left; margin-bottom: 10px;">Dolar U.S.A</h4>
+            <table class="table table-bordered cotizador" style="float:none; width:100%; text-align: center;" >
+                    <thead>
+                    <tr>
+                        <th>Monedas</th>
+                        <th>Compra</th>
+                        <th>Venta</th>
+                        <th>Fecha</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                                            <tr>
+                                                <td>Dolar U.S.A</td>
+                                                <td class="dest">16,9500</td>
+                                                <td class="dest">17,3500</td>
+                                                <td>14/8/2017</td>
+                                            </tr>
+
+                    </tbody>
+            </table>
+        </div>
+
+     <div id="tablaEuro" style="text-align:left;">
+            <h4 class="cotizador" style="float: left; margin-bottom: 10px;">EURO</h4>
+            <table class="table table-bordered cotizador" style="float:none; width:100%; text-align: center;">
+                    <thead>
+                    <tr>
+                        <th>Monedas</th>
+                        <th>Compra</th>
+                        <th>Venta</th>
+                        <th>Fecha</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                                            <tr>
+                                                <td>Euro</td>
+                                                <td class="dest">20,2500</td>
+                                                <td class="dest">21,2500</td>
+                                                <td>14/8/2017</td>
+                                            </tr>
+           
+                    </tbody>
+            </table>
+        </div>
+
+</div>
